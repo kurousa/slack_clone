@@ -1,6 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
-import { db } from "../firebase-v8";
+import { db } from "../lib/firebase-v8";
 // When Firebase SDK V9, use below.
 //import firebaseApp from '../firebase-v9';
 //import { getFirestore, addDoc, collection } from 'firebase/firestore';

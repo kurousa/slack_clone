@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
 import styled from 'styled-components'
 import InfoOutlinedIcon from '@material-ui/icons/InfoOutlined';
 import StarBorderOutlinedIcon from '@material-ui/icons/StarBorderOutlined';
@@ -11,14 +11,15 @@ import Messages from './Messages';
 
 function Chat() {
 
+    const chatRef = useRef(null);
     const channelId = useSelector(selectChannelId);
-    const [roomDetails] = useDocument( 
-        channelId && 
+    const [roomDetails] = useDocument(
+        channelId &&
         db
           .collection("rooms")
           .doc(channelId)
     )
-    const [roomMessages] = useCollection(
+    const [roomMessages, loading] = useCollection(
         channelId &&
         db
           .collection("rooms")
@@ -27,44 +28,53 @@ function Chat() {
           .orderBy("timestamp", "asc")
     )
 
-    console.log(roomDetails?.data().name)
+    useEffect(() => {
+        chatRef?.current?.scrollIntoView({
+            behavior: "smooth",
+        });
+    }, [channelId, loading])
+
     return (
         <ChatContainer>
-            <>
-                <Header>
-                    <HeaderLeft>
-                        <h4>
-                            <strong>#{roomDetails?.data().name}</strong>
-                        </h4>
-                        <StarBorderOutlinedIcon />
-                    </HeaderLeft>
-                    <HeaderRight>
-                        <p>
-                            <InfoOutlinedIcon /> Details
-                        </p>
-                    </HeaderRight>
-                </Header>
+            {roomDetails && roomMessages && (
+                <>
+                    <Header>
+                        <HeaderLeft>
+                            <h4>
+                                <strong>#{roomDetails?.data().name}</strong>
+                            </h4>
+                            <StarBorderOutlinedIcon />
+                        </HeaderLeft>
+                        <HeaderRight>
+                            <p>
+                                <InfoOutlinedIcon /> Details
+                            </p>
+                        </HeaderRight>
+                    </Header>
 
-                <ChatMessages>
-                    {roomMessages?.docs.map(doc => {
-                        const { message, timestamp, user, userImage } = doc.data();
-                        return (
-                          <Messages
-                            key={doc.id}
-                            message={message}
-                            timestamp={timestamp}
-                            user={user}
-                            userImage={userImage}
-                          />
-                        )
-                    })}
-                </ChatMessages>
+                    <ChatMessages>
+                        {roomMessages?.docs.map(doc => {
+                            const { message, timestamp, user, userImage } = doc.data();
+                            return (
+                                <Messages
+                                    key={doc.id}
+                                    message={message}
+                                    timestamp={timestamp}
+                                    user={user}
+                                    userImage={userImage}
+                                />
+                            )
+                        })}
+                        <ChatBottom ref={chatRef} />
+                    </ChatMessages>
 
-                <ChatInput
-                    channelName={roomDetails?.data().name}
-                    channelId={channelId}
-                />
-            </>
+                    <ChatInput
+                        chatRef={chatRef}
+                        channelName={roomDetails?.data().name}
+                        channelId={channelId}
+                    />
+                </>
+            )}
         </ChatContainer>
     )
 }
@@ -77,6 +87,7 @@ const Header = styled.div`
     padding: 20px;
     border-bottom: 1px solid lightgray;
 `;
+
 const HeaderLeft = styled.div`
     display: flex;
     align-items: center;
@@ -109,6 +120,10 @@ const HeaderRight = styled.div`
 const ChatMessages = styled.div`
 
 `;
+
+const ChatBottom = styled.div`
+    padding-bottom: 200px;
+`
 
 const ChatContainer = styled.div`
     flex: 0.7;

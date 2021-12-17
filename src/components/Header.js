@@ -4,30 +4,35 @@ import { Avatar } from '@material-ui/core';
 import AcceeTimeIcon from '@material-ui/icons/AccessTime';
 import SearchIcon from '@material-ui/icons/Search';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth } from '../lib/firebase-v8';
 
 function Header() {
-    return (
-        <HeaderContainer>
-            {/* Header Left */}
-            <HeaderLeft>
-              <HeaderAvatar
-                //TODO add onclick
-              />
-              <AcceeTimeIcon/>
-            </HeaderLeft>
+  const [ user ] = useAuthState(auth);
 
-            {/* Header Center */}
-            <HeaderSearch>
-              <SearchIcon/>
-              <input placeholder="Search keyword"/>
-            </HeaderSearch>
-            
-            {/* Header Right */}
-            <HeaderRight>
-              <HelpOutlineIcon/>
-            </HeaderRight>
-        </HeaderContainer>
-    );
+  return (
+      <HeaderContainer>
+          <HeaderLeft>
+            <HeaderAvatar
+              onClick={() => auth.signOut()}
+              src={user?.photoURL}
+              alt={user?.displayName}
+            />
+            <AcceeTimeIcon/>
+          </HeaderLeft>
+
+          {/* Header Center */}
+          <HeaderSearch>
+            <SearchIcon/>
+            <input placeholder="Search keyword"/>
+          </HeaderSearch>
+          
+          {/* Header Right */}
+          <HeaderRight>
+            <HelpOutlineIcon/>
+          </HeaderRight>
+      </HeaderContainer>
+  );
 }
 
 export default Header
@@ -52,6 +57,10 @@ const HeaderLeft = styled.div`
   > .MuiSvgIcon-root {
       margin-left: auto;
       margin-right: 30px;
+  }
+
+  > p {
+    margin-left: 10px;
   }
 `;
 

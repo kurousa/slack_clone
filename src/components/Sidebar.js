@@ -12,13 +12,16 @@ import FileCopyIcon from "@material-ui/icons/FileCopy";
 import ExpandLessIcon from "@material-ui/icons/ExpandLess";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import AddIcon from "@material-ui/icons/Add";
-import { db } from "../lib/firebase-v8";
+import { auth, db } from "../lib/firebase-v8";
 import { useCollection } from 'react-firebase-hooks/firestore';
+import { useAuthState } from 'react-firebase-hooks/auth';
 
 function Sidebar() {
     // eslint-disable-next-line
     const [channels, loading, error] = useCollection(db.collection("rooms"));
+    const [ user ] = useAuthState(auth);
 
+    
     return (
         <SidebarContainer>
             <SidebarHeader>
@@ -26,7 +29,7 @@ function Sidebar() {
                   <h2>HQ</h2>
                   <h3>
                       <FiberManualRecordIcon />
-                      Kurousa
+                      {user?.displayName}
                   </h3>
                 </SidebarInfo>
                 <CreateIcon/>
